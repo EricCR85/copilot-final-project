@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, type FormEvent } from 'react'
 
 /**
  * MODULE 2: Copilot Chat - Core Agent Features
@@ -64,16 +64,7 @@ export default function Module2Practice() {
             <h2 className="text-2xl font-semibold mb-4">➕ Lesson 2.2: Add a Feedback Form</h2>
             <p className="text-gray-600 mb-4">Use Agent Mode to create a form component below:</p>
 
-            {/* 
-            
-            ⬇️⬇️⬇️ CREATE YOUR FEEDBACK FORM HERE ⬇️⬇️⬇️
-            
-            Hint: Start with a comment like:
-            // TODO: Add a feedback form
-            
-            Then use Copilot to generate it!
-            
-            */}
+            <FeedbackForm />
           </section>
 
           {/* ==========================================
@@ -136,11 +127,21 @@ export default function Module2Practice() {
             <h2 className="text-2xl font-semibold mb-4">🎨 Challenge: Pricing Card</h2>
             <p className="text-gray-600 mb-4">Use Agent Mode to build a pricing card component:</p>
 
-            {/* 
-            
-            ⬇️⬇️⬇️ CREATE YOUR PRICING CARD HERE ⬇️⬇️⬇️
-            
-            */}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <PricingCard
+                title="Starter"
+                price="$19/mo"
+                description="Perfect for individuals launching their first project."
+                features={['1 project', 'Basic analytics', 'Email support']}
+              />
+              <PricingCard
+                title="Pro"
+                price="$49/mo"
+                description="Great for teams that need more power and collaboration."
+                features={['Unlimited projects', 'Advanced analytics', 'Priority support']}
+                highlighted
+              />
+            </div>
           </section>
         </div>
       </div>
@@ -209,6 +210,143 @@ function BrokenCalculator() {
 
       <p className="text-lg">Result: {result}</p>
     </div>
+  )
+}
+
+function PricingCard({
+  title,
+  price,
+  description,
+  features,
+  highlighted = false,
+}: {
+  title: string
+  price: string
+  description: string
+  features: string[]
+  highlighted?: boolean
+}) {
+  return (
+    <div
+      className={`rounded-xl border p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg ${
+        highlighted
+          ? 'border-blue-500 bg-blue-50 shadow-md ring-2 ring-blue-200'
+          : 'border-slate-200 bg-white'
+      }`}
+    >
+      <h3 className={`text-xl font-semibold ${highlighted ? 'text-blue-700' : 'text-slate-800'}`}>
+        {title}
+      </h3>
+      <p className={`mt-2 text-sm ${highlighted ? 'text-blue-600' : 'text-slate-600'}`}>
+        {description}
+      </p>
+      <div
+        className={`mt-6 text-4xl font-bold ${highlighted ? 'text-blue-700' : 'text-slate-900'}`}
+      >
+        {price}
+      </div>
+      <ul className="mt-4 space-y-2 text-sm text-slate-600">
+        {features.map(feature => (
+          <li key={feature} className="flex items-center gap-2">
+            <span className="text-green-500">✓</span>
+            <span>{feature}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+function FeedbackForm() {
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [message, setMessage] = useState('')
+  const [submitted, setSubmitted] = useState(false)
+  const [error, setError] = useState('')
+
+  const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+  const hasAllFieldsFilled = name.trim() !== '' && email.trim() !== '' && message.trim() !== ''
+  const isFormValid = hasAllFieldsFilled && isValidEmail(email)
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+
+    if (!isFormValid) {
+      setError('Please complete all fields and use a valid email address.')
+      setSubmitted(false)
+      return
+    }
+
+    setError('')
+    setSubmitted(true)
+  }
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-5 rounded-xl border border-slate-200 bg-slate-50 p-6 shadow-sm"
+    >
+      <div>
+        <label className="mb-1 block text-sm font-medium text-slate-700" htmlFor="name">
+          Name
+        </label>
+        <input
+          id="name"
+          type="text"
+          value={name}
+          onChange={e => setName(e.target.value)}
+          className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm shadow-sm transition focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-200"
+          placeholder="Your name"
+        />
+      </div>
+
+      <div>
+        <label className="mb-1 block text-sm font-medium text-slate-700" htmlFor="email">
+          Email
+        </label>
+        <input
+          id="email"
+          type="email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm shadow-sm transition focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-200"
+          placeholder="your@example.com"
+        />
+      </div>
+
+      <div>
+        <label className="mb-1 block text-sm font-medium text-slate-700" htmlFor="message">
+          Message
+        </label>
+        <textarea
+          id="message"
+          value={message}
+          onChange={e => setMessage(e.target.value)}
+          className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm shadow-sm transition focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-200"
+          placeholder="Write your feedback..."
+          rows={4}
+        />
+      </div>
+
+      {error && (
+        <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
+          {error}
+        </p>
+      )}
+      {submitted && (
+        <p className="rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700">
+          Thanks for your feedback, {name}!
+        </p>
+      )}
+
+      <button
+        type="submit"
+        disabled={!isFormValid}
+        className="rounded-lg bg-green-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-green-300"
+      >
+        Submit Feedback
+      </button>
+    </form>
   )
 }
 
