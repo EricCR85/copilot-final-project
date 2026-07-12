@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 
 /**
  * MODULE 1: Setup & Orientation
@@ -80,6 +80,10 @@ export default function Module1Practice() {
             */}
           </section>
         </div>
+        <section className="bg-white p-6 rounded-lg shadow mt-8">
+          <h2 className="text-2xl font-semibold mb-4">Feedback</h2>
+          <FeedbackForm />
+        </section>
       </div>
     </div>
   )
@@ -112,11 +116,11 @@ function SimpleCounter() {
 
 // Data transformation component for Exercise 2
 function DataTransformer() {
-  const [numbers] = useState([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+  const [numbers] = useState<number[]>([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
 
-  const evenNumbers = numbers.filter(num => num % 2 === 0)
-  const doubledNumbers = evenNumbers.map(num => num * 2)
-  const sum = doubledNumbers.reduce((acc, num) => acc + num, 0)
+  const evenNumbers = numbers.filter((num: number) => num % 2 === 0)
+  const doubledNumbers = evenNumbers.map((num: number) => num * 2)
+  const sum = doubledNumbers.reduce((acc: number, num: number) => acc + num, 0)
 
   return (
     <div className="space-y-2">
@@ -221,3 +225,138 @@ function ComplexFilter() {
  * prompting it effectively!
  *
  * ========================================== */
+
+
+// TODO: Add a feedback form
+function FeedbackForm() {
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [message, setMessage] = useState('')
+  const isFormValid = name.trim() !== '' && email.trim() !== '' && message.trim() !== ''
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    // Simple submit behavior: log and clear
+    console.log('Feedback submitted', { name, email, message })
+    setName('')
+    setEmail('')
+    setMessage('')
+    alert('Thanks for your feedback!')
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6 bg-white p-8 rounded-lg shadow-md">
+      <div>
+        <label className="block text-sm font-semibold text-gray-700 mb-2">Name</label>
+        <input
+          type="text"
+          value={name}
+          onChange={e => setName(e.target.value)}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          required
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+        <input
+          type="email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          required
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-semibold text-gray-700 mb-2">Message</label>
+        <textarea
+          value={message}
+          onChange={e => setMessage(e.target.value)}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+          rows={4}
+          required
+        />
+      </div>
+
+      <div>
+        <button type="submit" className="w-full px-4 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200">
+          Send Feedback
+        </button>
+      </div>
+    </form>
+  )
+}
+
+// Smaller pieces for pricing card
+/*
+  Security considerations for the contact/feedback form above:
+  - XSS: user-controlled inputs (name, email, message) must be escaped/sanitized
+    before rendering or stored content must be sanitized when displayed.
+  - Server-side validation: never rely solely on client-side checks; validate
+    and normalize inputs on the server.
+  - CSRF: protect POST endpoints (CSRF token or same-site cookies) to prevent
+    cross-site request forgery.
+  - Rate limiting / abuse: implement throttling, CAPTCHA, or other anti-spam
+    controls to mitigate automated submissions and brute-force abuse.
+  - Email injection: if form triggers emails, ensure header injection is prevented.
+  - Sensitive data handling: avoid logging raw PII (email, full messages) in
+    plaintext; store/encrypt according to data protection requirements.
+  - Transport security: use HTTPS to protect data in transit.
+  - File uploads (if added later): validate file types, size limits, and store
+    outside the web root.
+  - Error handling: avoid leaking stack traces or internal details to users.
+  - CORS and auth: tighten CORS policies and require authentication where needed.
+*/
+function CardHeader({ title }: { title: string }) {
+  return <h3 className="text-lg sm:text-xl font-semibold mb-2">{title}</h3>
+}
+
+function PriceDisplay({ price }: { price: string | number }) {
+  return <p className="text-2xl sm:text-3xl font-bold mb-3">${price}</p>
+}
+
+function CardDescription({ children }: { children?: React.ReactNode }) {
+  if (!children) return null
+  return <p className="text-sm sm:text-base text-gray-600">{children}</p>
+}
+
+function PricingCard({
+  title,
+  price,
+  description,
+  highlight,
+}: {
+  title: string
+  price: string | number
+  description?: string
+  highlight?: boolean
+}) {
+  return (
+    <div
+      className={`w-full sm:w-auto border rounded-lg p-4 sm:p-6 shadow-sm bg-white ${
+        highlight ? 'border-blue-500 ring-2 ring-blue-200' : ''
+      }`}
+      role="region"
+      aria-label={`${title} pricing card`}
+    >
+      <CardHeader title={title} />
+      <PriceDisplay price={price} />
+      <CardDescription>{description}</CardDescription>
+    </div>
+  )
+}
+
+// Example usage: Pro plan highlighted, placed in a responsive container
+function PricingExamples() {
+  return (
+    <div className="w-full max-w-4xl mx-auto px-4">
+      <div className="flex flex-col sm:flex-row sm:items-stretch gap-4">
+        <PricingCard title="Pro Plan" price={29} description="Monthly subscription with priority support" highlight />
+      </div>
+    </div>
+  )
+}
+
+// Render examples in this file where appropriate
+<PricingExamples />

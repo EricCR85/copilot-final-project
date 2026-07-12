@@ -139,34 +139,38 @@ export default function Module3Practice() {
 
 /* ==========================================
  * 🔄 PROMISE-BASED COMPONENT
- * Refactor this to use async/await!
+ * This already uses async/await. Kept as an async function; wrap in useCallback for stability.
  * ========================================== */
 function PromiseBasedComponent() {
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const fetchUserData = useCallback(async () => {
+    const controller = new AbortController()
+    const signal = controller.signal
 
-  // This uses .then() chains - convert it to async/await!
-  const fetchUserData = () => {
     setLoading(true)
     setError(null)
 
-    fetch('https://jsonplaceholder.typicode.com/users/1')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok')
-        }
-        return response.json()
-      })
-      .then(userData => {
-        setData(userData)
-        setLoading(false)
-      })
-      .catch(err => {
-        setError(err.message)
-        setLoading(false)
-      })
-  }
+    try {
+      const response = await fetch('https://jsonplaceholder.typicode.com/users/1', { signal })
+      if (!response.ok) {
+        throw new Error('Network response was not ok')
+      }
+
+      const userData = await response.json()
+      setData(userData)
+    } catch (err: any) {
+      // Ignore abort errors
+      if (err.name === 'AbortError') return
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+
+    // Optional: return abort controller so callers can cancel if needed
+    return controller
+  }, [])
 
   return (
     <div className="space-y-4">
@@ -178,7 +182,8 @@ function PromiseBasedComponent() {
       <button
         onClick={fetchUserData}
         disabled={loading}
-        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
+        aria-label="Submit Form"
+        className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 disabled:bg-gray-400 disabled:scale-100 disabled:shadow-none"
       >
         {loading ? 'Loading...' : 'Fetch User Data'}
       </button>
@@ -273,7 +278,15 @@ function InaccessibleForm() {
  * Refactor this into smaller, clearer functions!
  * ========================================== */
 function MessyComponent() {
-  const [items, setItems] = useState([
+  type Item = {
+    id: number
+    name: string
+    category: string
+    price: number
+    inStock: boolean
+  }
+
+  const [items, setItems] = useState<Item[]>([
     { id: 1, name: 'Apple', category: 'Fruit', price: 1.5, inStock: true },
     { id: 2, name: 'Banana', category: 'Fruit', price: 0.8, inStock: true },
     { id: 3, name: 'Carrot', category: 'Vegetable', price: 1.2, inStock: false },
@@ -281,28 +294,31 @@ function MessyComponent() {
   ])
   const [filter, setFilter] = useState('')
   const [sort, setSort] = useState('name')
+  // Helper functions to clarify intent
+  // Keep only items that match the selected category filter.
+  const filterByCategory = (list: Item[], category: string) => {
+    if (category === '') return list
+    return list.filter(i => i.category.toLowerCase() === category.toLowerCase())
+  }
 
-  // This is too long and does too many things - break it down!
-  const processedItems = items
-    .filter(item => {
-      if (filter === '') return true
-      return item.category.toLowerCase() === filter.toLowerCase()
-    })
-    .filter(item => item.inStock)
-    .sort((a, b) => {
-      if (sort === 'name') {
-        return a.name.localeCompare(b.name)
-      } else if (sort === 'price') {
-        return a.price - b.price
-      }
-      return 0
-    })
-    .map(item => {
-      const discountedPrice = item.price > 2 ? item.price * 0.9 : item.price
+  const filterInStock = (list: Item[]) => list.filter(i => i.inStock)
+
+  const sortItems = (list: Item[], key: string) => {
+    const copy = [...list]
+    if (key === 'name') return copy.sort((a, b) => a.name.localeCompare(b.name))
+    if (key === 'price') return copy.sort((a, b) => a.price - b.price)
+    return copy
+  }
+
+  const enhanceItems = (list: Item[]) =>
+    list.map(i => {
+      const discountedPrice = i.price > 2 ? i.price * 0.9 : i.price
       const formattedPrice = `$${discountedPrice.toFixed(2)}`
-      const isOnSale = item.price > 2
-      return { ...item, discountedPrice, formattedPrice, isOnSale }
+      const isOnSale = i.price > 2
+      return { ...i, discountedPrice, formattedPrice, isOnSale }
     })
+
+  const processedItems = enhanceItems(sortItems(filterInStock(filterByCategory(items, filter)), sort))
 
   return (
     <div className="space-y-4">
@@ -314,7 +330,7 @@ function MessyComponent() {
       <div className="grid grid-cols-2 gap-4">
         <select
           value={filter}
-          onChange={e => setFilter(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFilter(e.target.value)}
           className="px-4 py-2 border rounded"
         >
           <option value="">All Categories</option>
@@ -324,7 +340,7 @@ function MessyComponent() {
 
         <select
           value={sort}
-          onChange={e => setSort(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSort(e.target.value)}
           className="px-4 py-2 border rounded"
         >
           <option value="name">Sort by Name</option>
