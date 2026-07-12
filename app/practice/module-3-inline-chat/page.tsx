@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 
 /**
  * MODULE 3: Inline Chat - Edit Mode in Depth
@@ -318,7 +318,9 @@ function MessyComponent() {
       return { ...i, discountedPrice, formattedPrice, isOnSale }
     })
 
-  const processedItems = enhanceItems(sortItems(filterInStock(filterByCategory(items, filter)), sort))
+  const processedItems = enhanceItems(
+    sortItems(filterInStock(filterByCategory(items, filter)), sort)
+  )
 
   return (
     <div className="space-y-4">
