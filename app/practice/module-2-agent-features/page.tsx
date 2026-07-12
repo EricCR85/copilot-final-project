@@ -155,17 +155,22 @@ export default function Module2Practice() {
 function BrokenCalculator() {
   const [num1, setNum1] = useState('')
   const [num2, setNum2] = useState('')
-  const [result, setResult] = useState(0)
+  const [result, setResult] = useState<number | string>(0)
 
-  // Bug: This function has issues with type conversion and error handling
   const calculate = () => {
-    const sum = num1 + num2 // Bug: String concatenation instead of addition
+    const sum = Number(num1) + Number(num2)
     setResult(sum)
   }
 
-  // Bug: Missing divide by zero check
   const divide = () => {
-    setResult(num1 / num2)
+    const divisor = Number(num2)
+
+    if (divisor === 0) {
+      setResult('Cannot divide by zero')
+      return
+    }
+
+    setResult(Number(num1) / divisor)
   }
 
   return (
