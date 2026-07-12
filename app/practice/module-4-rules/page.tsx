@@ -79,26 +79,26 @@ const Module4Practice: FC = () => {
             <ul className="list-disc list-inside text-sm text-gray-700 mb-4 space-y-1">
               <li>
                 <code>
-                  // Scaffold a LoginForm with email, password, and submit button. Client-side
+                  {'//'} Scaffold a LoginForm with email, password, and submit button. Client-side
                   validation, Tailwind styling, accessible labels.
                 </code>
               </li>
               <li>
                 <code>
-                  // Build a ProfileCard with avatar image, name, bio, and a “Contact” button. Keep
-                  layout responsive and concise.
+                  {'//'} Build a ProfileCard with avatar image, name, bio, and a “Contact” button.
+                  Keep layout responsive and concise.
                 </code>
               </li>
               <li>
                 <code>
-                  // Create a PrimaryButton component (props: children, onClick, type?). Apply our
-                  standard Tailwind button style.
+                  {'//'} Create a PrimaryButton component (props: children, onClick, type?). Apply
+                  our standard Tailwind button style.
                 </code>
               </li>
               <li>
                 <code>
-                  // Implement a simple SearchBar with input, clear button, and debounced onChange
-                  callback (300ms).
+                  {'//'} Implement a simple SearchBar with input, clear button, and debounced
+                  onChange callback (300ms).
                 </code>
               </li>
             </ul>
@@ -133,25 +133,25 @@ const Module4Practice: FC = () => {
             <ul className="list-disc list-inside text-sm text-gray-700 mb-4 space-y-1">
               <li>
                 <code>
-                  // Create a NotificationBadge (props: count, maxCount?) that displays “99+” when
-                  over max.
+                  {'//'} Create a NotificationBadge (props: count, maxCount?) that displays “99+”
+                  when over max.
                 </code>
               </li>
               <li>
                 <code>
-                  // Create a ProgressBar (props: value 0–100, label?). Include accessible markup
-                  for screen readers.
+                  {'//'} Create a ProgressBar (props: value 0–100, label?). Include accessible
+                  markup for screen readers.
                 </code>
               </li>
               <li>
                 <code>
-                  // Create a ModalDialog (props: open, onClose, title). Include a close button and
-                  focus trap note in comments.
+                  {'//'} Create a ModalDialog (props: open, onClose, title). Include a close button
+                  and focus trap note in comments.
                 </code>
               </li>
               <li>
                 <code>
-                  // Create a DataTable shell (columns prop, rows prop). Responsive table layout
+                  {'//'} Create a DataTable shell (columns prop, rows prop). Responsive table layout
                   with Tailwind utilities.
                 </code>
               </li>
@@ -176,7 +176,11 @@ const Module4Practice: FC = () => {
               </button>
             </div>
 
-            <ModalDialog open={isModalOpen} onClose={() => setIsModalOpen(false)} title="Example Modal">
+            <ModalDialog
+              open={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+              title="Example Modal"
+            >
               <p>This is a simple modal dialog with a close button and a basic open/close state.</p>
             </ModalDialog>
 
